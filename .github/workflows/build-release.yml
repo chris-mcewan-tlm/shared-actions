@@ -1,0 +1,36 @@
+name: Build and Release
+description: 'Builds & tests .NET and creates symantic versioned release PR'
+
+inputs:
+  dotnet_version:
+    description: 'Version of .NET to use, defaults to 8.0.x'
+    required: false
+    default: '8.0.x'
+  token:
+    description: 'Github token'
+    required: true
+
+runs:
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ inputs.dotnet_version }}
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: release-please
+      uses: googleapis/release-please-action@v4
+      with: 
+        token: ${{ inputs.token }}
+        release-type: simple
