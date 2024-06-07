@@ -1,36 +1,53 @@
-name: Build and Release
-description: 'Builds & tests .NET and creates symantic versioned release PR'
+# Builds & tests .NET and creates symantic versioned release PR
+name: .NET Build and Release
 
-inputs:
-  dotnet_version:
-    description: 'Version of .NET to use, defaults to 8.0.x'
-    required: false
-    default: '8.0.x'
-  token:
-    description: 'Github token'
-    required: true
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: 'Enter version of .NET required, defaults to 8.0.x'
+        required: false
+        default: '8.0.x'
+        type: string
+      token:
+        description: 'Github token'
+        required: true
+        type: boolean
 
-runs:
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+jobs:
+    setup:
+      runs-on: windows-latest
 
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ inputs.dotnet_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: dotnet restore
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
 
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+      - name: Install dependencies
+        run: dotnet restore
 
-    - name: Run tests
-      run: dotnet test --no-restore --verbosity normal
+    build:
+      runs-on: windows-latest
+      needs: setup
 
-    - name: release-please
-      uses: googleapis/release-please-action@v4
-      with: 
-        token: ${{ inputs.token }}
-        release-type: simple
+      steps:
+        - name: Build
+          run: dotnet build --configuration Release --no-restore
+
+        - name: Run tests
+          run: dotnet test --no-restore --verbosity normal
+    
+    release:
+      runs-on: windows-latest
+      needs: build
+      
+      steps:
+        - name: release-please
+          uses: googleapis/release-please-action@v4
+          with: 
+            token: ${{ inputs.token }}
+            release-type: simple
