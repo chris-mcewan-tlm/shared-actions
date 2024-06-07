@@ -17,23 +17,21 @@ on:
 jobs:
     setup:
       runs-on: windows-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        - name: Set up .NET
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: ${{ inputs.dotnet_version }}
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ inputs.dotnet_version }}
-
-      - name: Install dependencies
-        run: dotnet restore
+        - name: Install dependencies
+          run: dotnet restore
 
     build:
       runs-on: windows-latest
       needs: setup
-
       steps:
         - name: Build
           run: dotnet build --configuration Release --no-restore
@@ -43,8 +41,7 @@ jobs:
     
     release:
       runs-on: windows-latest
-      needs: build
-      
+      needs: build    
       steps:
         - name: release-please
           uses: googleapis/release-please-action@v4
