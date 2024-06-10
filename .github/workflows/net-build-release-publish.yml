@@ -49,7 +49,7 @@ jobs:
           run: dotnet pack --configuration Release --no-build --output nupkg
 
         - name: Publish NuGet if PR
-          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != '' && ${{ steps.release.outputs.release_created }}
+          if: ${{ steps.release.outputs.release_created }}
           run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }} --skip-duplicate
 
 env:
