@@ -1,5 +1,5 @@
-# Builds & tests .NET and creates symantic versioned release PR
-name: .NET Build and Release
+# Builds, Creates a release and optionally publishes to NuGet
+name: .NET Build, Release & Publish
 
 on:
   workflow_call:
@@ -9,10 +9,14 @@ on:
         required: false
         default: '8.0.x'
         type: string
-      token:
-        description: 'Github token'
+      nuget_endpoint:
+        description: 'Proget Publish API Endpoint'
         required: false
-        type: boolean
+        type: string
+      nuget_key:
+        description: 'API key with permissions to push NuGet packages'
+        required: false
+        type: string
 
 jobs:
     build-release:
@@ -38,5 +42,15 @@ jobs:
         - name: release-please
           uses: googleapis/release-please-action@v4
           with: 
-#            token: ${{ inputs.token }}
             release-type: simple
+
+        - name: Pack
+          run: dotnet pack --configuration Release --no-build --output ./nupkg
+
+        - name: Publish NuGet
+          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
+          run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ inputs.nuget_key }} --source ${{ inputs.nuget_endpoint }}
+
+env:
+  NUGET_ENDPOINT: ${{ inputs.nuget_endpoint }}
+  NUGET_KEY: ${{ inputs.nuget_key }}
