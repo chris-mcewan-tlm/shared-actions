@@ -46,11 +46,8 @@ jobs:
         - name: Pack
           run: dotnet pack --configuration Release --no-build --output nupkg
 
-        - name: List contents
-          run: ls
-
         - name: Publish NuGet
-          #if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
+          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
           run: |
             dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }}
 
