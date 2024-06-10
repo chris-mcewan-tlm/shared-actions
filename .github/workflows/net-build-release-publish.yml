@@ -39,16 +39,17 @@ jobs:
           run: dotnet test --no-restore --verbosity normal
     
         - name: release-please
+          id: release
           uses: googleapis/release-please-action@v4
           with: 
             release-type: simple
 
         - name: Pack if PR
-          if: github.event_name == 'pull_request'
+          if: ${{ steps.release.outputs.release_created }}
           run: dotnet pack --configuration Release --no-build --output nupkg
 
         - name: Publish NuGet if PR
-          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != '' && github.event_name == 'pull_request'
+          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != '' && ${{ steps.release.outputs.release_created }}
           run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }} --skip-duplicate
 
 env:
