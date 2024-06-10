@@ -43,11 +43,12 @@ jobs:
           with: 
             release-type: simple
 
-        - name: Pack
+        - name: Pack if PR
+          if: github.event_name == 'pull_request'
           run: dotnet pack --configuration Release --no-build --output nupkg
 
-        - name: Publish NuGet
-          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
+        - name: Publish NuGet if PR
+          if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != '' && github.event_name == 'pull_request'
           run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }} --skip-duplicate
 
 env:
