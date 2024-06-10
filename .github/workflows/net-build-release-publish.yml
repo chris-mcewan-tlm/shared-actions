@@ -44,11 +44,11 @@ jobs:
           with: 
             release-type: simple
 
-        - name: Pack if PR
+        - name: Pack
           if: ${{ steps.release.outputs.release_created }}
-          run: dotnet pack --configuration Release --no-build --output nupkg
+          run: dotnet pack --no-build --output nupkg --configuration Release /p:Version=${{ steps.release.outputs.tag_name }}
 
-        - name: Publish NuGet if PR
+        - name: Push to NuGet
           if: ${{ steps.release.outputs.release_created }}
           run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }} --skip-duplicate
 
