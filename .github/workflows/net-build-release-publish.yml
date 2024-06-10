@@ -48,7 +48,9 @@ jobs:
 
         - name: Publish NuGet
           #if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
-          run: dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }}
+          run: |
+            $pwd
+            dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }}
 
 env:
   NUGET_ENDPOINT: ${{ inputs.NUGET_ENDPOINT }}
