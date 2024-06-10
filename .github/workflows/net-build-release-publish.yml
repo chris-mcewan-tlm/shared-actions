@@ -47,7 +47,9 @@ jobs:
         - name: Pack
           if: ${{ steps.release.outputs.release_created }}
           run: |
-            Remove-Item -Path "nupkg" -Recurse -Force
+            if(Test-Path -Path "./nupkg") { 
+              Remove-Item -Path "./nupkg" -Recurse -Force -ErrorAction SilentlyContinue 
+            }          
             dotnet pack --no-build --output nupkg --configuration Release /p:Version=${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor}}.${{ steps.release.outputs.patch }}
 
         - name: Push to NuGet
