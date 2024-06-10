@@ -54,7 +54,7 @@ jobs:
 
         - name: Push to NuGet
           if: ${{ steps.release.outputs.release_created }}
-          run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }}
+          run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }} --skip-duplicate
 
 env:
   NUGET_ENDPOINT: ${{ inputs.NUGET_ENDPOINT }}
