@@ -44,12 +44,11 @@ jobs:
             release-type: simple
 
         - name: Pack
-          run: dotnet pack --configuration Release --no-build --output ./nupkg
+          run: dotnet pack --configuration Release --no-build --output nupkg
 
         - name: Publish NuGet
           #if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
           run: |
-            echo $pwd
             dotnet nuget push nupkg/*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }}
 
 env:
