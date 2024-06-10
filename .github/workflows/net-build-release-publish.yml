@@ -1,22 +1,21 @@
-# Builds, Creates a release and optionally publishes to NuGet
+# Builds, Creates a release and optionally publish to NuGet
 name: .NET Build, Release & Publish
 
 on:
   workflow_call:
     inputs:
-      dotnet_version:
+      DOTNET_VERSION:
         description: 'Enter version of .NET required, defaults to 8.0.x'
         required: false
         default: '8.0.x'
         type: string
-      nuget_endpoint:
+      NUGET_ENDPOINT:
         description: 'Proget Publish API Endpoint'
         required: false
         type: string
-      nuget_key:
-        description: 'API key with permissions to push NuGet packages'
+    secrets:
+      NUGET_KEY:
         required: false
-        type: string
 
 jobs:
     build-release:
@@ -28,7 +27,7 @@ jobs:
         - name: Set up .NET
           uses: actions/setup-dotnet@v1
           with:
-            dotnet-version: ${{ inputs.dotnet_version }}
+            dotnet-version: ${{ inputs.DOTNET_VERSION }}
 
         - name: Install dependencies
           run: dotnet restore
@@ -49,8 +48,8 @@ jobs:
 
         - name: Publish NuGet
           if: env.NUGET_ENDPOINT != '' && env.NUGET_KEY != ''
-          run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ inputs.nuget_key }} --source ${{ inputs.nuget_endpoint }}
+          run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }}
 
 env:
-  NUGET_ENDPOINT: ${{ inputs.nuget_endpoint }}
-  NUGET_KEY: ${{ inputs.nuget_key }}
+  NUGET_ENDPOINT: ${{ inputs.NUGET_ENDPOINT }}
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
