@@ -21,10 +21,10 @@ jobs:
     build-release:
       runs-on: [self-hosted]
       steps:
-        - name: Checkout code
+        - name: Checkout
           uses: actions/checkout@v2
 
-        - name: Set up .NET
+        - name: Setup .NET
           uses: actions/setup-dotnet@v1
           with:
             dotnet-version: ${{ inputs.DOTNET_VERSION }}
@@ -35,10 +35,10 @@ jobs:
         - name: Build
           run: dotnet build --configuration Release --no-restore
 
-        - name: Run tests
+        - name: Test
           run: dotnet test --no-restore --verbosity normal
     
-        - name: release-please
+        - name: Release
           id: release
           uses: googleapis/release-please-action@v4
           with: 
@@ -52,7 +52,7 @@ jobs:
             }          
             dotnet pack --no-build --output nupkg --configuration Release /p:Version=${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor}}.${{ steps.release.outputs.patch }}
 
-        - name: Push to NuGet
+        - name: Push NuGet
           if: ${{ steps.release.outputs.release_created }}
           run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source ${{ inputs.NUGET_ENDPOINT }} --skip-duplicate
 
